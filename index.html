@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f0f1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="라이더루틴">
+<title>라이더 루틴</title>
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f0f1a;
+  --bg2: #16162a;
+  --bg3: #1e1e30;
+  --card: #1a1a2e;
+  --border: rgba(255,255,255,0.07);
+  --accent: #00e5a0;
+  --accent2: #378ADD;
+  --warn: #ffb400;
+  --danger: #ff4d6d;
+  --text: #e8e8f0;
+  --muted: #6e6e8a;
+  --font-en: 'Space Grotesk', sans-serif;
+  --font-kr: 'Noto Sans KR', sans-serif;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font-kr); overscroll-behavior: none; }
+
+/* ── Layout ── */
+.app { display: flex; flex-direction: column; height: 100%; max-width: 430px; margin: 0 auto; background: var(--bg); }
+.header { background: var(--bg); padding: calc(var(--safe-top) + 12px) 20px 0; border-bottom: 1px solid var(--border); }
+.content { flex: 1; overflow-y: auto; padding-bottom: calc(var(--safe-bottom) + 64px); }
+.nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: rgba(15,15,26,0.92); backdrop-filter: blur(20px); border-top: 1px solid var(--border); display: flex; padding-bottom: var(--safe-bottom); z-index: 100; }
+
+/* ── Header ── */
+.header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.app-title { font-family: var(--font-en); font-size: 18px; font-weight: 600; letter-spacing: -0.3px; color: var(--text); }
+.app-title span { color: var(--accent); }
+.live-badge { display: flex; align-items: center; gap: 5px; background: rgba(0,229,160,0.12); border: 1px solid rgba(0,229,160,0.3); border-radius: 20px; padding: 4px 10px; font-size: 11px; font-family: var(--font-en); color: var(--accent); font-weight: 500; }
+.live-badge.off { background: rgba(255,255,255,0.05); border-color: var(--border); color: var(--muted); }
+.live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: blink 1.2s ease-in-out infinite; }
+.live-badge.off .live-dot { background: var(--muted); animation: none; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+.hstats { display: grid; grid-template-columns: repeat(3,1fr); gap: 0; margin: 0 -20px; }
+.hstat { text-align: center; padding: 10px 0 14px; position: relative; }
+.hstat + .hstat::before { content:''; position:absolute; left:0; top:20%; height:60%; width:1px; background:var(--border); }
+.hstat-val { font-family: var(--font-en); font-size: 22px; font-weight: 600; color: var(--text); letter-spacing: -0.5px; }
+.hstat-label { font-size: 10px; color: var(--muted); margin-top: 2px; letter-spacing: 0.3px; }
+
+/* ── Nav ── */
+.nav-btn { flex: 1; border: none; background: none; color: var(--muted); padding: 10px 4px; display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10px; font-family: var(--font-kr); cursor: pointer; transition: color 0.2s; }
+.nav-btn.active { color: var(--accent); }
+.nav-icon { font-size: 20px; }
+
+/* ── Pages ── */
+.page { display: none; padding: 16px 20px 0; }
+.page.active { display: block; }
+
+/* ── Section title ── */
+.sec { font-size: 10px; font-weight: 700; letter-spacing: 1.2px; color: var(--muted); text-transform: uppercase; margin-bottom: 10px; margin-top: 20px; }
+.sec:first-child { margin-top: 0; }
+
+/* ── Rest card ── */
+.rest-card { background: var(--card); border: 1px solid rgba(0,229,160,0.2); border-radius: 16px; padding: 16px; margin-bottom: 4px; position: relative; overflow: hidden; }
+.rest-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+.rest-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.rest-icon { width: 38px; height: 38px; background: rgba(0,229,160,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+.rest-title { font-size: 15px; font-weight: 700; color: var(--text); }
+.rest-sub { font-size: 11px; color: var(--accent); margin-top: 1px; }
+.rest-times { display: flex; align-items: center; justify-content: space-between; background: var(--bg3); border-radius: 10px; padding: 12px 16px; }
+.rt-block { text-align: center; }
+.rt-label { font-size: 10px; color: var(--muted); margin-bottom: 2px; }
+.rt-val { font-family: var(--font-en); font-size: 24px; font-weight: 600; color: var(--text); }
+.rt-arrow { font-size: 18px; color: var(--muted); }
+.rest-reason { font-size: 11px; color: var(--muted); text-align: center; margin-top: 8px; }
+.rest-reason span { color: var(--accent); font-weight: 500; }
+
+/* ── Timeline ── */
+.tl-wrap { margin-bottom: 4px; }
+.tl-labels { display: flex; justify-content: space-between; font-family: var(--font-en); font-size: 10px; color: var(--muted); margin-bottom: 5px; }
+canvas { display: block; width: 100%; }
+.tl-canvas-wrap { height: 28px; border-radius: 6px; overflow: hidden; }
+.tl-legend { display: flex; gap: 14px; margin-top: 7px; }
+.tl-leg { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); }
+.tl-dot { width: 8px; height: 8px; border-radius: 2px; }
+
+/* ── Bar chart ── */
+.bar-canvas-wrap { height: 72px; border-radius: 6px; overflow: hidden; background: var(--bg3); }
+.bar-time-labels { display: flex; justify-content: space-between; font-family: var(--font-en); font-size: 9px; color: var(--muted); margin-top: 4px; }
+
+/* ── Track button ── */
+.track-btn { width: 100%; padding: 15px; border: none; border-radius: 14px; background: var(--accent); color: #0f0f1a; font-size: 16px; font-weight: 700; font-family: var(--font-kr); cursor: pointer; margin-top: 20px; margin-bottom: 4px; transition: all 0.2s; letter-spacing: -0.3px; }
+.track-btn:active { transform: scale(0.98); }
+.track-btn.stop { background: var(--danger); color: #fff; }
+
+/* ── Stats ── */
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; }
+.stat-val { font-family: var(--font-en); font-size: 22px; font-weight: 600; color: var(--text); }
+.stat-label { font-size: 11px; color: var(--muted); margin-top: 3px; }
+.stat-card.accent { border-color: rgba(0,229,160,0.25); }
+.stat-card.accent .stat-val { color: var(--accent); }
+
+.weekly-bars { display: flex; align-items: flex-end; gap: 6px; height: 90px; background: var(--bg3); border-radius: 10px; padding: 10px 12px 0; margin-bottom: 4px; }
+.wbar-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; height: 100%; justify-content: flex-end; }
+.wbar-wrap { flex: 1; display: flex; align-items: flex-end; width: 100%; }
+.wbar-fill { width: 100%; background: var(--accent2); border-radius: 3px 3px 0 0; min-height: 4px; transition: height 0.4s ease; }
+.wbar-label { font-size: 10px; color: var(--muted); font-family: var(--font-kr); }
+.wbar-val { font-size: 9px; color: var(--muted); font-family: var(--font-en); }
+
+/* ── Regions ── */
+.map-canvas-wrap { height: 200px; background: var(--bg3); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
+
+/* ── Settings ── */
+.setting-group { background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 14px; }
+.setting-row { display: flex; align-items: center; justify-content: space-between; padding: 13px 16px; border-bottom: 1px solid var(--border); }
+.setting-row:last-child { border-bottom: none; }
+.setting-label { font-size: 14px; color: var(--text); }
+.setting-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.setting-input { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 14px; font-family: var(--font-en); padding: 5px 10px; width: 90px; text-align: right; outline: none; }
+.setting-input:focus { border-color: var(--accent); }
+.save-btn { width: 100%; padding: 14px; border: none; border-radius: 12px; background: var(--bg3); border: 1px solid var(--border); color: var(--text); font-size: 14px; font-family: var(--font-kr); cursor: pointer; transition: all 0.2s; font-weight: 500; }
+.save-btn:active { background: var(--accent); color: var(--bg); }
+
+/* ── Toast ── */
+#toast { position: fixed; bottom: calc(70px + var(--safe-bottom)); left: 50%; transform: translateX(-50%) translateY(10px); background: var(--bg3); border: 1px solid var(--border); color: var(--text); font-size: 13px; padding: 10px 20px; border-radius: 20px; opacity: 0; transition: all 0.25s; white-space: nowrap; z-index: 999; pointer-events: none; }
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── No data ── */
+.no-data { text-align: center; padding: 32px 0; color: var(--muted); font-size: 13px; line-height: 1.8; }
+.no-data-icon { font-size: 40px; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-top">
+      <div class="app-title">rider<span>.</span>routine</div>
+      <div class="live-badge off" id="live-badge">
+        <div class="live-dot"></div>
+        <span id="live-text">대기 중</span>
+      </div>
+    </div>
+    <div class="hstats">
+      <div class="hstat">
+        <div class="hstat-val" id="h-work">0:00</div>
+        <div class="hstat-label">운행 시간</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-val" id="h-rest">0:00</div>
+        <div class="hstat-label">휴식 시간</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-val" id="h-dist">0.0km</div>
+        <div class="hstat-label">이동 거리</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+
+    <!-- 오늘 -->
+    <div class="page active" id="page-today">
+      <div class="sec">추천 휴식 타임</div>
+      <div class="rest-card">
+        <div class="rest-header">
+          <div class="rest-icon">🌙</div>
+          <div>
+            <div class="rest-title">오늘의 휴식 구간</div>
+            <div class="rest-sub">AI 동선 분석 기반</div>
+          </div>
+        </div>
+        <div class="rest-times">
+          <div class="rt-block">
+            <div class="rt-label">시작</div>
+            <div class="rt-val" id="rest-start">--:--</div>
+          </div>
+          <div class="rt-arrow">→</div>
+          <div class="rt-block">
+            <div class="rt-label">종료</div>
+            <div class="rt-val" id="rest-end">--:--</div>
+          </div>
+          <div class="rt-block">
+            <div class="rt-label">쉬는 시간</div>
+            <div class="rt-val" style="color:var(--accent)">2h</div>
+          </div>
+        </div>
+        <div class="rest-reason" id="rest-pct">추적을 시작하면 분석이 시작돼요</div>
+      </div>
+
+      <div class="sec" style="margin-top:20px">오늘 동선 타임라인</div>
+      <div class="tl-wrap">
+        <div class="tl-labels">
+          <span>9시</span><span>12시</span><span>15시</span><span>18시</span><span>21시</span>
+        </div>
+        <div class="tl-canvas-wrap">
+          <canvas id="timeline-canvas" height="28"></canvas>
+        </div>
+        <div class="tl-legend">
+          <div class="tl-leg"><div class="tl-dot" style="background:#378ADD"></div>이동(한가)</div>
+          <div class="tl-leg"><div class="tl-dot" style="background:#ff4d6d"></div>정지(바쁨)</div>
+          <div class="tl-leg"><div class="tl-dot" style="background:rgba(255,180,0,0.5)"></div>추천 휴식</div>
+        </div>
+      </div>
+
+      <div class="sec">시간대별 한가한 빈도</div>
+      <div class="bar-canvas-wrap">
+        <canvas id="bar-canvas" height="72"></canvas>
+      </div>
+      <div class="bar-time-labels">
+        <span>9</span><span>11</span><span>13</span><span>15</span><span>17</span><span>19</span><span>21</span>
+      </div>
+
+      <button class="track-btn" id="track-btn">▶  GPS 추적 시작</button>
+    </div>
+
+    <!-- 통계 -->
+    <div class="page" id="page-stats">
+      <div class="sec">주간 한가한 시간</div>
+      <div class="weekly-bars" id="weekly-bars">
+        <div class="no-data" style="width:100%">데이터를 모으는 중이에요</div>
+      </div>
+
+      <div class="sec">누적 통계</div>
+      <div class="stat-grid">
+        <div class="stat-card accent">
+          <div class="stat-val" id="stat-days">0일</div>
+          <div class="stat-label">총 추적 일수</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" id="stat-dist">0km</div>
+          <div class="stat-label">총 이동 거리</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" id="stat-peak">--시</div>
+          <div class="stat-label">주요 피크타임</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" id="stat-avg-rest">--시</div>
+          <div class="stat-label">평균 한가한 시작</div>
+        </div>
+      </div>
+
+      <div class="sec">피크타임 패턴</div>
+      <div class="stat-card" style="margin-bottom:4px">
+        <div style="font-size:13px;color:var(--muted);line-height:1.9">
+          데이터가 쌓일수록 정확해져요.<br>
+          7일 이상 추적하면 요일별 패턴이 보여요.<br>
+          <span style="color:var(--accent)">점심·저녁 피크타임</span>을 자동으로 감지해요.
+        </div>
+      </div>
+    </div>
+
+    <!-- 지역 -->
+    <div class="page" id="page-regions">
+      <div class="sec">내 배달 동선 지도</div>
+      <div class="map-canvas-wrap" id="region-map">
+        <canvas id="map-canvas" height="200"></canvas>
+      </div>
+      <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:6px">
+        GPS 포인트가 쌓일수록 지도가 정밀해져요
+      </div>
+
+      <div class="sec">지역 통계</div>
+      <div class="stat-card" style="margin-bottom:4px">
+        <div style="font-size:13px;color:var(--muted);line-height:1.9" id="region-stats">
+          추적을 시작하면 자주 가는 지역이 여기에 표시돼요.
+        </div>
+      </div>
+    </div>
+
+    <!-- 설정 -->
+    <div class="page" id="page-settings">
+      <div class="sec">운행 설정</div>
+      <div class="setting-group">
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">운행 시작 시간</div>
+            <div class="setting-sub">GPS 추적 기준 시작</div>
+          </div>
+          <input class="setting-input" id="set-start" type="time" value="09:00">
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">운행 종료 시간</div>
+            <div class="setting-sub">GPS 추적 기준 종료</div>
+          </div>
+          <input class="setting-input" id="set-end" type="time" value="21:00">
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">목표 휴식 시간</div>
+            <div class="setting-sub">하루 권장 휴식 (시간)</div>
+          </div>
+          <input class="setting-input" id="set-rest" type="number" value="3" min="1" max="6" step="0.5">
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">정지 판단 기준</div>
+            <div class="setting-sub">이 시간(분) 이상 멈추면 정지</div>
+          </div>
+          <input class="setting-input" id="set-stop" type="number" value="1" min="1" max="10">
+        </div>
+      </div>
+
+      <div class="sec">데이터</div>
+      <div class="setting-group">
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">저장된 세션</div>
+            <div class="setting-sub" id="session-count">불러오는 중...</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="save-btn" id="save-settings">설정 저장</button>
+
+      <div style="margin-top:16px;padding:14px;background:var(--card);border-radius:12px;border:1px solid var(--border)">
+        <div style="font-size:12px;color:var(--muted);line-height:1.8">
+          💡 <strong style="color:var(--text)">홈 화면에 설치하기</strong><br>
+          크롬 → 메뉴(⋮) → "홈 화면에 추가"<br>
+          사파리 → 공유(□↑) → "홈 화면에 추가"<br><br>
+          설치하면 앱처럼 실행되고 오프라인도 작동해요!
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+
+  <!-- Nav -->
+  <nav class="nav">
+    <button class="nav-btn active" onclick="showPage('today')">
+      <span class="nav-icon">⏱</span>오늘
+    </button>
+    <button class="nav-btn" onclick="showPage('stats')">
+      <span class="nav-icon">📊</span>통계
+    </button>
+    <button class="nav-btn" onclick="showPage('regions')">
+      <span class="nav-icon">🗺</span>지역
+    </button>
+    <button class="nav-btn" onclick="showPage('settings')">
+      <span class="nav-icon">⚙</span>설정
+    </button>
+  </nav>
+
+</div>
+
+<div id="toast"></div>
+
+<script src="app.js"></script>
+<script>
+// live badge sync
+const origStart = window.startTracking;
+const origStop = window.stopTracking;
+function syncBadge() {
+  const badge = document.getElementById('live-badge');
+  const txt = document.getElementById('live-text');
+  if (window.tracking) {
+    badge.classList.remove('off'); txt.textContent = '추적 중';
+  } else {
+    badge.classList.add('off'); txt.textContent = '대기 중';
+  }
+}
+document.getElementById('track-btn').addEventListener('click', () => setTimeout(syncBadge, 100));
+
+// Session count
+function updateSessionCount() {
+  try {
+    const count = Object.keys(JSON.parse(localStorage.getItem('rider_sessions') || '{}')).length;
+    document.getElementById('session-count').textContent = `${count}일치 데이터 저장됨`;
+  } catch {}
+}
+updateSessionCount();
+document.querySelectorAll('.nav-btn').forEach(b => b.addEventListener('click', updateSessionCount));
+</script>
+</body>
+</html>

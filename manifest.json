@@ -1,0 +1,17 @@
+{
+  "name": "라이더 루틴",
+  "short_name": "라이더루틴",
+  "description": "배달 라이더 동선 추적 & 휴식 타임 추천",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#0f0f1a",
+  "theme_color": "#0f0f1a",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%230f0f1a'/><circle cx='96' cy='96' r='48' fill='none' stroke='%2300e5a0' stroke-width='6'/><circle cx='96' cy='96' r='8' fill='%2300e5a0'/><line x1='96' y1='48' x2='96' y2='68' stroke='%2300e5a0' stroke-width='4' stroke-linecap='round'/></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ]
+}
